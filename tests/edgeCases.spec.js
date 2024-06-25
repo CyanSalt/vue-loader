@@ -106,7 +106,7 @@ test('normalize multiple use + options', done => {
 
 test('should not duplicate css modules value imports', done => {
   mockBundleAndRun({
-    entry: './test/fixtures/duplicate-cssm.js',
+    entry: './tests/fixtures/duplicate-cssm.js',
     modify: config => {
       config.module.rules[1] = {
         test: /\.css$/,

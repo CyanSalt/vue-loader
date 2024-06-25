@@ -1,41 +1,27 @@
 {
-  "name": "vue-loader",
+  "name": "@cyansalt/vue-loader",
   "version": "15.11.1",
   "description": "Vue single-file component loader for Webpack",
   "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "types": "lib/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "jest --env node",
+    "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider jest --env node",
     "test:match-resource": "cross-env INLINE_MATCH_RESOURCE=true jest --env node",
     "lint": "eslint lib test --fix",
-    "build": "webpack --config example/webpack.config.js --hide-modules",
-    "dev": "webpack-dev-server --config example/webpack.config.js --inline --hot",
-    "docs": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
     "prepublishOnly": "conventional-changelog -p angular -r 1 -i CHANGELOG.md -s"
   },
-  "author": "Evan You",
-  "license": "MIT",
+  "author": "CyanSalt",
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/vuejs/vue-loader/issues"
+    "url": "https://github.com/CyanSalt/vue-loader/issues"
   },
-  "homepage": "https://github.com/vuejs/vue-loader",
+  "homepage": "https://github.com/CyanSalt/vue-loader",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vuejs/vue-loader.git"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "lib/**/*.js": [
-      "eslint --fix",
-      "git add"
-    ],
-    "test/**/*.js": [
-      "eslint --fix",
-      "git add"
-    ]
+    "url": "https://github.com/CyanSalt/vue-loader.git"
   },
   "peerDependencies": {
     "css-loader": "*",
@@ -69,14 +55,10 @@
     "cross-env": "^7.0.3",
     "css-loader": "^1.0.0",
     "eslint": "^4.19.0",
-    "eslint-plugin-vue-libs": "^2.1.0",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^4.0.0",
-    "javascript-stringify": "^1.6.0",
     "jest": "^23.5.0",
     "jsdom": "^11.6.2",
-    "json": "^9.0.6",
-    "lint-staged": "^7.0.0",
     "markdown-loader": "^2.0.2",
     "memfs": "^3.1.2",
     "mini-css-extract-plugin": "^0.4.1",
@@ -92,18 +74,12 @@
     "sugarss": "^1.0.1",
     "thread-loader": "^3.0.4",
     "ts-loader": "^4.2.0",
-    "typescript": "^4.8.4",
+    "typescript": "^5.5.2",
     "url-loader": "^1.0.1",
-    "vue": "^2.7.14",
-    "vue-server-renderer": "^2.7.14",
-    "vue-template-compiler": "^2.7.14",
-    "vuepress": "^0.14.2",
-    "vuepress-theme-vue": "^1.1.0",
+    "vue": "^2.7.16",
+    "vue-server-renderer": "^2.7.16",
+    "vue-template-compiler": "^2.7.16",
     "webpack": "^4.46.0",
-    "webpack-cli": "^3.2.0",
-    "webpack-dev-server": "^3.1.1",
-    "webpack-merge": "^4.1.2",
-    "yorkie": "^1.0.3"
-  },
-  "packageManager": "pnpm@8.9.2"
+    "webpack-merge": "^4.1.2"
+  }
 }

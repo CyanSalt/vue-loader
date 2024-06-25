@@ -11,7 +11,7 @@ const {
 test('SSR style and moduleId extraction', done => {
   bundle({
     target: 'node',
-    entry: './test/fixtures/ssr-style.js',
+    entry: './tests/fixtures/ssr-style.js',
     output: {
       path: '/',
       filename: 'test.build.js',
@@ -50,7 +50,7 @@ test('SSR style and moduleId extraction', done => {
 test('SSR with scoped CSS', done => {
   bundle({
     target: 'node',
-    entry: './test/fixtures/ssr-scoped-style.js',
+    entry: './tests/fixtures/ssr-scoped-style.js',
     output: {
       path: '/',
       filename: 'test.build.js',

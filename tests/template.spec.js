@@ -271,7 +271,7 @@ test('multiple roots in template', done => {
 
 test('separate loader configuration for template lang and js imports', done => {
   mockBundleAndRun({
-    entry: './test/fixtures/template-pre.js',
+    entry: './tests/fixtures/template-pre.js',
     module: {
       rules: [
         {

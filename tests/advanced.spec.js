@@ -49,7 +49,7 @@ test('expose file path as __file outside production', done => {
   mockBundleAndRun({
     entry: 'basic.vue'
   }, ({ module }) => {
-    expect(module.__file).toBe('test/fixtures/basic.vue')
+    expect(module.__file).toBe('tests/fixtures/basic.vue')
     done()
   })
 })
@@ -235,7 +235,7 @@ test('should work with eslint loader', async () => {
 //       // remove default rule
 //       config.module.rules.shift()
 //     },
-//     entry: './test/fixtures/multiple-rules.js',
+//     entry: './tests/fixtures/multiple-rules.js',
 //     module: {
 //       rules: [
 //         {

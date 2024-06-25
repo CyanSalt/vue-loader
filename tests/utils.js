@@ -51,7 +51,7 @@ function genId (file) {
   return hash(path.join('tests', 'fixtures', file).replace(/\\/g, '/'))
 }
 
-function bundle (options, cb, wontThrowError) {
+function bundle (options, wontThrowError) {
   let config = merge({}, baseConfig, options)
   if (!options.experiments || !options.experiments.css) {
     config.module && config.module.rules && config.module.rules.push({
@@ -106,52 +106,58 @@ function bundle (options, cb, wontThrowError) {
   const webpackCompiler = webpack(config)
   webpackCompiler.outputFileSystem = mfs
   webpackCompiler.outputFileSystem.join = path.join.bind(path)
-  webpackCompiler.run((err, stats) => {
-    if (!wontThrowError) {
-      expect(err).toBeNull()
 
-      if (stats.hasErrors()) {
-        return console.error(stats.toString('errors-only'))
+  return new Promise((resolve, reject) => {
+    webpackCompiler.run((err, stats) => {
+      if (!wontThrowError) {
+        expect(err).toBeNull()
+
+        if (stats.hasErrors()) {
+          return console.error(stats.toString('errors-only'))
+        }
+        expect(stats.hasErrors()).toBeFalsy()
       }
-      expect(stats.hasErrors()).toBeFalsy()
-    }
-    cb(mfs.readFileSync('/test.build.js').toString(), stats, err)
+      if (err) {
+        reject(err)
+      } else {
+        resolve({
+          code: mfs.readFileSync('/test.build.js').toString(),
+          stats
+        })
+      }
+    })
   })
 }
 
-function mockBundleAndRun (options, assert, wontThrowError) {
-  const { suppressJSDOMConsole } = options
-  delete options.suppressJSDOMConsole
-  bundle(options, (code, bundleStats, bundleError) => {
-    let dom, jsdomError
-    try {
-      dom = new JSDOM(`<!DOCTYPE html><html><head></head><body></body></html>`, {
-        runScripts: 'outside-only',
-        virtualConsole: suppressJSDOMConsole ? new VirtualConsole() : null
-      })
-      dom.window.eval(code)
-    } catch (e) {
-      console.error(`JSDOM error:\n${e.stack}`)
-      jsdomError = e
-    }
+async function mockBundleAndRun (options, wontThrowError) {
+  const { code, stats } = await bundle(options, wontThrowError)
 
-    const { window } = dom
-    const { module, exports } = window
-    const instance = {}
-    if (module && module.beforeCreate) {
-      module.beforeCreate.forEach(hook => hook.call(instance))
-    }
-    assert({
-      window,
-      module,
-      exports,
-      instance,
-      code,
-      jsdomError,
-      bundleStats,
-      bundleError
+  let dom
+  try {
+    dom = new JSDOM(`<!DOCTYPE html><html><head></head><body></body></html>`, {
+      runScripts: 'outside-only',
+      virtualConsole: new VirtualConsole()
     })
-  }, wontThrowError)
+    dom.window.eval(code)
+  } catch (e) {
+    console.error(`JSDOM error:\n${e.stack}`)
+    throw e
+  }
+
+  const { window } = dom
+  const { module, exports } = window
+  const instance = {}
+  if (module && module.beforeCreate) {
+    module.beforeCreate.forEach(hook => hook.call(instance))
+  }
+  return {
+    window,
+    module,
+    exports,
+    instance,
+    code,
+    stats
+  }
 }
 
 function mockRender (options, data = {}) {

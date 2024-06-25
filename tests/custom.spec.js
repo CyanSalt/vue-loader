@@ -4,49 +4,45 @@ const {
   mockBundleAndRun
 } = require('./utils')
 
-test('add custom blocks to the webpack output', done => {
-  bundle({
+test('add custom blocks to the webpack output', async () => {
+  const { code } = await bundle({
     entry: 'custom-language.vue',
     module: {
       rules: [
         { test: /\.js/, loader: 'babel-loader' }
       ]
     }
-  }, code => {
-    // should also be transpiled
-    expect(code).toContain(`
+  })
+  // should also be transpiled
+  expect(code).toContain(`
 describe('example', function () {
   it('basic', function (done) {
     done();
   });
 });
-    `.trim())
-    done()
-  })
+  `.trim())
 })
 
-test('custom blocks should work with src imports', done => {
-  bundle({
+test('custom blocks should work with src imports', async () => {
+  const { code } = await bundle({
     entry: 'custom-import.vue',
     module: {
       rules: [
         { test: /\.js/, loader: 'babel-loader' }
       ]
     }
-  }, (code) => {
-    expect(code).toContain(`
+  })
+  expect(code).toContain(`
 describe('example', function () {
   it('basic', function (done) {
     done();
   });
 });
-    `.trim())
-    done()
-  })
+  `.trim())
 })
 
-test('passes Component to custom block loaders', done => {
-  mockBundleAndRun({
+test('passes Component to custom block loaders', async () => {
+  const { module } = await mockBundleAndRun({
     entry: 'custom-language.vue',
     module: {
       rules: [
@@ -56,40 +52,31 @@ test('passes Component to custom block loaders', done => {
         }
       ]
     }
-  }, ({ module }) => {
-    expect(module.__docs).toContain('This is example documentation for a component.')
-    done()
   })
+  expect(module.__docs).toContain('This is example documentation for a component.')
 })
 
-test('custom blocks can be ignored', done => {
-  bundle({
+test('custom blocks can be ignored', async () => {
+  const { code } = await bundle({
     entry: 'custom-language.vue'
-  }, code => {
-    expect(code).not.toContain(`describe('example'`)
-    done()
   })
+  expect(code).not.toContain(`describe('example'`)
 })
 
-test('custom blocks can be ignored even if cache-loader processes them', done => {
-  bundle(
-    {
-      entry: 'custom-language.vue',
-      module: {
-        rules: [
-          {
-            test: /.vue$/,
-            loader: 'cache-loader',
-            options: {
-              cacheDirectory: path.resolve(__dirname, '.cache')
-            }
+test('custom blocks can be ignored even if cache-loader processes them', async () => {
+  const { code } = await bundle({
+    entry: 'custom-language.vue',
+    module: {
+      rules: [
+        {
+          test: /.vue$/,
+          loader: 'cache-loader',
+          options: {
+            cacheDirectory: path.resolve(__dirname, '.cache')
           }
-        ]
-      }
-    },
-    code => {
-      expect(code).not.toContain(`describe('example'`)
-      done()
+        }
+      ]
     }
-  )
+  })
+  expect(code).not.toContain(`describe('example'`)
 })

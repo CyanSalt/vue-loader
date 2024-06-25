@@ -9,8 +9,8 @@ const {
   DEFAULT_VUE_USE
 } = require('./utils')
 
-test('support chaining with other loaders', done => {
-  mockBundleAndRun({
+test('support chaining with other loaders', async () => {
+  const { module } = await mockBundleAndRun({
     entry: 'basic.vue',
     modify: config => {
       config.module.rules[0] = {
@@ -21,14 +21,12 @@ test('support chaining with other loaders', done => {
         ]
       }
     }
-  }, ({ module }) => {
-    expect(module.data().msg).toBe('Changed!')
-    done()
   })
+  expect(module.data().msg).toBe('Changed!')
 })
 
-test('inherit queries on files', done => {
-  mockBundleAndRun({
+test('inherit queries on files', async () => {
+  const { module } = await mockBundleAndRun({
     entry: 'basic.vue?change',
     modify: config => {
       config.module.rules[0] = {
@@ -39,56 +37,38 @@ test('inherit queries on files', done => {
         ]
       }
     }
-  }, ({ module }) => {
-    expect(module.data().msg).toBe('Changed!')
-    done()
   })
+  expect(module.data().msg).toBe('Changed!')
 })
 
-test('expose file path as __file outside production', done => {
-  mockBundleAndRun({
+test('expose file path as __file outside production', async () => {
+  const { module } = await mockBundleAndRun({
     entry: 'basic.vue'
-  }, ({ module }) => {
-    expect(module.__file).toBe('tests/fixtures/basic.vue')
-    done()
   })
+  expect(module.__file).toBe('tests/fixtures/basic.vue')
 })
 
-test('no __file in production when exposeFilename disabled', done => {
-  const origNodeEnv = process.env.NODE_ENV
-  process.env.NODE_ENV = 'production'
-  mockBundleAndRun(
-    {
-      entry: 'basic.vue'
-    },
-    ({ module }) => {
-      expect(module.__file).toBe(undefined)
-      process.env.NODE_ENV = origNodeEnv
-      done()
+test('no __file in production when exposeFilename disabled', async () => {
+  const { module } = await mockBundleAndRun({
+    mode: 'production',
+    entry: 'basic.vue'
+  })
+  expect(module.__file).toBe(undefined)
+})
+
+test('expose file basename as __file in production when exposeFilename enabled', async () => {
+  const { module } = await mockBundleAndRun({
+    mode: 'production',
+    entry: 'basic.vue',
+    vue: {
+      exposeFilename: true
     }
-  )
+  })
+  expect(module.__file).toBe('basic.vue')
 })
 
-test('expose file basename as __file in production when exposeFilename enabled', done => {
-  const origNodeEnv = process.env.NODE_ENV
-  process.env.NODE_ENV = 'production'
-  mockBundleAndRun(
-    {
-      entry: 'basic.vue',
-      vue: {
-        exposeFilename: true
-      }
-    },
-    ({ module }) => {
-      expect(module.__file).toBe('basic.vue')
-      process.env.NODE_ENV = origNodeEnv
-      done()
-    }
-  )
-})
-
-test('extract CSS', done => {
-  bundle({
+test('extract CSS', async () => {
+  await bundle({
     entry: 'extract-css.vue',
     modify: config => {
       config.module.rules = [
@@ -118,18 +98,16 @@ test('extract CSS', done => {
         filename: 'test.output.css'
       })
     ]
-  }, code => {
-    const css = normalizeNewline(mfs.readFileSync('/test.output.css').toString())
-    const id = `data-v-${genId('extract-css.vue')}`
-    expect(css).toContain(`h1 {\n  color: #f00;\n}`)
-    // extract + scoped
-    expect(css).toContain(`h2[${id}] {\n  color: green;\n}`)
-    done()
   })
+  const css = normalizeNewline(mfs.readFileSync('/test.output.css').toString())
+  const id = `data-v-${genId('extract-css.vue')}`
+  expect(css).toContain(`h1 {\n  color: #f00;\n}`)
+  // extract + scoped
+  expect(css).toContain(`h2[${id}] {\n  color: green;\n}`)
 })
 
-test('extract CSS with code spliting', done => {
-  bundle({
+test('extract CSS with code spliting', async () => {
+  await bundle({
     entry: 'extract-css-chunks.vue',
     modify: config => {
       config.module.rules = [
@@ -151,52 +129,42 @@ test('extract CSS with code spliting', done => {
         filename: 'test.output.css'
       })
     ]
-  }, code => {
-    const css = normalizeNewline(mfs.readFileSync('/test.output.css').toString())
-    expect(css).toContain(`h1 {\n  color: red;\n}`)
-    expect(mfs.existsSync('/empty.test.output.css')).toBe(false)
-    expect(mfs.existsSync('/basic.test.output.css')).toBe(true)
-    done()
   })
+  const css = normalizeNewline(mfs.readFileSync('/test.output.css').toString())
+  expect(css).toContain(`h1 {\n  color: red;\n}`)
+  expect(mfs.existsSync('/empty.test.output.css')).toBe(false)
+  expect(mfs.existsSync('/basic.test.output.css')).toBe(true)
 })
 
 test('support rules with oneOf', async () => {
-  const run = (entry, assert) => new Promise((resolve, reject) => {
-    mockBundleAndRun({
-      entry,
-      modify: config => {
-        config.module.rules = [
-          { test: /\.vue$/, use: [DEFAULT_VUE_USE] },
-          {
-            test: /\.css$/,
-            use: 'vue-style-loader',
-            oneOf: [
-              {
-                resourceQuery: /module/,
-                use: [
-                  {
-                    loader: 'css-loader',
-                    options: {
-                      modules: true,
-                      localIdentName: '[local]_[hash:base64:5]'
-                    }
+  const run = entry => mockBundleAndRun({
+    entry,
+    modify: config => {
+      config.module.rules = [
+        { test: /\.vue$/, use: [DEFAULT_VUE_USE] },
+        {
+          test: /\.css$/,
+          use: 'vue-style-loader',
+          oneOf: [
+            {
+              resourceQuery: /module/,
+              use: [
+                {
+                  loader: 'css-loader',
+                  options: {
+                    modules: true,
+                    localIdentName: '[local]_[hash:base64:5]'
                   }
-                ]
-              },
-              {
-                use: ['css-loader']
-              }
-            ]
-          }
-        ]
-      }
-    }, res => {
-      const { jsdomError, bundleError } = res
-      if (jsdomError) return reject(jsdomError)
-      if (bundleError) return reject(bundleError)
-      assert(res)
-      resolve()
-    })
+                }
+              ]
+            },
+            {
+              use: ['css-loader']
+            }
+          ]
+        }
+      ]
+    }
   })
 
   await run('basic.vue', ({ window }) => {
@@ -215,85 +183,12 @@ test('support rules with oneOf', async () => {
 })
 
 test('should work with eslint loader', async () => {
-  // TODO:
-  return new Promise(resolve => {
-    bundle({
-      entry: 'basic.vue',
-      modify: config => {
-        config.module.rules.unshift({
-          test: /\.vue$/, use: [DEFAULT_VUE_USE], enforce: 'pre'
-        })
-      }
-    }, () => resolve())
+  await bundle({
+    entry: 'basic.vue',
+    modify: config => {
+      config.module.rules.unshift({
+        test: /\.vue$/, use: [DEFAULT_VUE_USE], enforce: 'pre'
+      })
+    }
   })
 })
-
-// TODO
-// test('multiple rule definitions', done => {
-//   mockBundleAndRun({
-//     modify: config => {
-//       // remove default rule
-//       config.module.rules.shift()
-//     },
-//     entry: './tests/fixtures/multiple-rules.js',
-//     module: {
-//       rules: [
-//         {
-//           test: /\.vue$/,
-//           oneOf: [
-//             {
-//               include: /-1\.vue$/,
-//               loader: loaderPath,
-//               options: {
-//                 postcss: [
-//                   css => {
-//                     css.walkDecls('font-size', decl => {
-//                       decl.value = `${parseInt(decl.value, 10) * 2}px`
-//                     })
-//                   }
-//                 ],
-//                 compilerModules: [{
-//                   postTransformNode: el => {
-//                     el.staticClass = '"multiple-rule-1"'
-//                   }
-//                 }]
-//               }
-//             },
-//             {
-//               include: /-2\.vue$/,
-//               loader: loaderPath,
-//               options: {
-//                 postcss: [
-//                   css => {
-//                     css.walkDecls('font-size', decl => {
-//                       decl.value = `${parseInt(decl.value, 10) / 2}px`
-//                     })
-//                   }
-//                 ],
-//                 compilerModules: [{
-//                   postTransformNode: el => {
-//                     el.staticClass = '"multiple-rule-2"'
-//                   }
-//                 }]
-//               }
-//             }
-//           ]
-//         }
-//       ]
-//     }
-//   }, (window, module) => {
-//     const vnode1 = mockRender(window.rules[0])
-//     const vnode2 = mockRender(window.rules[1])
-//     expect(vnode1.data.staticClass).toBe('multiple-rule-1')
-//     expect(vnode2.data.staticClass).toBe('multiple-rule-2')
-//     const styles = window.document.querySelectorAll('style')
-//     const expr = /\.multiple-rule-\d\s*\{\s*font-size:\s*([.0-9]+)px;/
-//     for (let i = 0, l = styles.length; i < l; i++) {
-//       const content = styles[i].textContent
-//       if (expr.test(content)) {
-//         expect(parseFloat(RegExp.$1)).toBe(14)
-//       }
-//     }
-//     done()
-//   })
-// })

@@ -15,7 +15,7 @@ const assertComponent = ({
   window,
   module,
   expectedMsg = 'Hello from Component A!'
-}, done) => {
+}) => {
   if (typeof module === 'function') {
     module = module.options
   }
@@ -33,11 +33,10 @@ const assertComponent = ({
   let style = window.document.querySelector('style').textContent
   style = normalizeNewline(style)
   expect(style).toContain('comp-a h2 {\n  color: #f00;\n}')
-  done()
 }
 
-test('vue rule with include', done => {
-  mockBundleAndRun({
+test('vue rule with include', async () => {
+  const res = await mockBundleAndRun({
     entry: 'basic.vue',
     modify: config => {
       config.module.rules[0] = {
@@ -46,11 +45,12 @@ test('vue rule with include', done => {
         use: [DEFAULT_VUE_USE]
       }
     }
-  }, res => assertComponent(res, done))
+  })
+  assertComponent(res)
 })
 
-test('test-less oneOf rules', done => {
-  mockBundleAndRun({
+test('test-less oneOf rules', async () => {
+  const res = await mockBundleAndRun({
     entry: 'basic.vue',
     modify: config => {
       config.module.rules = [
@@ -68,11 +68,12 @@ test('test-less oneOf rules', done => {
         }
       ]
     }
-  }, res => assertComponent(res, done))
+  })
+  assertComponent(res)
 })
 
-test('babel-loader inline options', done => {
-  bundle({
+test('babel-loader inline options', async () => {
+  await bundle({
     entry: 'basic.vue',
     module: {
       rules: [
@@ -88,12 +89,12 @@ test('babel-loader inline options', done => {
         }
       ]
     }
-  }, () => done(), true)
+  }, true)
 })
 
 // #1210
-test('normalize multiple use + options', done => {
-  bundle({
+test('normalize multiple use + options', async () => {
+  await bundle({
     entry: 'basic.vue',
     modify: config => {
       config.module.rules[0] = {
@@ -101,11 +102,11 @@ test('normalize multiple use + options', done => {
         use: [DEFAULT_VUE_USE]
       }
     }
-  }, () => done(), true)
+  }, true)
 })
 
-test('should not duplicate css modules value imports', done => {
-  mockBundleAndRun({
+test('should not duplicate css modules value imports', async () => {
+  const { window, exports, code } = await mockBundleAndRun({
     entry: './tests/fixtures/duplicate-cssm.js',
     modify: config => {
       config.module.rules[1] = {
@@ -121,24 +122,22 @@ test('should not duplicate css modules value imports', done => {
         ]
       }
     }
-  }, ({ window, exports, code }) => {
-    const localsRE = /exports.locals = {\s+"color": "red"\s+};/
-    const matches = code.match(localsRE)
-    expect(matches.length).toBe(1)
-
-    const styles = window.document.querySelectorAll('style')
-    expect(styles.length).toBe(2) // one for values, one for the component
-    const style = normalizeNewline(styles[1].textContent)
-    // value should be injected
-    expect(style).toMatch('color: red;')
-    // exports is set as the locals imported from values.css
-    expect(exports.color).toBe('red')
-    done()
   })
+  const localsRE = /exports.locals = {\s+"color": "red"\s+};/
+  const matches = code.match(localsRE)
+  expect(matches.length).toBe(1)
+
+  const styles = window.document.querySelectorAll('style')
+  expect(styles.length).toBe(2) // one for values, one for the component
+  const style = normalizeNewline(styles[1].textContent)
+  // value should be injected
+  expect(style).toMatch('color: red;')
+  // exports is set as the locals imported from values.css
+  expect(exports.color).toBe('red')
 })
 
-test('html-webpack-plugin', done => {
-  bundle({
+test('html-webpack-plugin', async () => {
+  await bundle({
     entry: 'basic.vue',
     plugins: [
       new HTMLPlugin({
@@ -147,15 +146,13 @@ test('html-webpack-plugin', done => {
         filename: 'output.html'
       })
     ]
-  }, () => {
-    const html = mfs.readFileSync('/output.html', 'utf-8')
-    expect(html).toMatch('test.build.js')
-    done()
   }, true)
+  const html = mfs.readFileSync('/output.html', 'utf-8')
+  expect(html).toMatch('test.build.js')
 })
 
-test('usage with null-loader', done => {
-  mockBundleAndRun({
+test('usage with null-loader', async () => {
+  await mockBundleAndRun({
     entry: 'basic.vue',
     modify: config => {
       config.module.rules[1] = {
@@ -163,13 +160,11 @@ test('usage with null-loader', done => {
         use: ['null-loader']
       }
     }
-  }, ({ window, exports, code }) => {
-    done()
   })
 })
 
-test('proper dedupe on src-imports with options', done => {
-  mockBundleAndRun({
+test('proper dedupe on src-imports with options', async () => {
+  const res = await mockBundleAndRun({
     entry: 'ts.vue',
     resolve: {
       extensions: ['.ts', '.js']
@@ -183,12 +178,13 @@ test('proper dedupe on src-imports with options', done => {
         }
       ]
     }
-  }, res => assertComponent(res, done))
+  })
+  assertComponent(res)
 }, 30000)
 
 // #1351
-test('use with postLoader', done => {
-  mockBundleAndRun({
+test('use with postLoader', async () => {
+  const { window, module } = await mockBundleAndRun({
     entry: 'basic.vue',
     module: {
       rules: [
@@ -201,25 +197,24 @@ test('use with postLoader', done => {
         }
       ]
     }
-  }, ({ window, module }) => {
-    assertComponent({
-      window,
-      module,
-      expectedMsg: 'Changed!'
-    }, done)
+  })
+  assertComponent({
+    window,
+    module,
+    expectedMsg: 'Changed!'
   })
 })
 
 // #1711
-test('data: URI as entry', done => {
+test('data: URI as entry', async () => {
   // this feature is only available in webpack 5
   if (webpack.version.startsWith('4')) {
-    done()
+    return
   }
 
-  bundle({
+  await bundle({
     entry: {
       main: 'data:text/javascript,console.log("hello world")'
     }
-  }, () => done())
+  })
 })

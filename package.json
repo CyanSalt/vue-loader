@@ -1,6 +1,9 @@
 {
   "name": "@cyansalt/vue-loader",
   "version": "15.11.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "ISC",
   "author": "CyanSalt",
   "main": "lib/index.js",
@@ -11,9 +14,8 @@
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider jest",
     "test:match-resource": "cross-env INLINE_MATCH_RESOURCE=true NODE_OPTIONS=--openssl-legacy-provider jest",
-    "test:webpack4": "cross-env WEBPACK4=true NODE_OPTIONS=--openssl-legacy-provider jest",
     "lint": "eslint --fix './**/*.{js,mjs}'",
-    "prepublishOnly": "conventional-changelog -p angular -r 1 -i CHANGELOG.md -s"
+    "release": "release-it"
   },
   "bugs": {
     "url": "https://github.com/CyanSalt/vue-loader/issues"
@@ -49,12 +51,12 @@
     "@cyansalt/eslint-config": "^4.1.0",
     "@cyansalt/tsconfig": "^2.2.1",
     "@jest/globals": "^29.7.0",
+    "@release-it/conventional-changelog": "^8.0.1",
     "@types/webpack": "^4.4.27",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
     "cache-loader": "^4.1.0",
-    "conventional-changelog-cli": "^1.3.22",
     "cross-env": "^7.0.3",
     "css-loader": "^1.0.0",
     "eslint": "^9.5.0",
@@ -71,6 +73,7 @@
     "pug": "^3.0.3",
     "pug-plain-loader": "^1.0.0",
     "raw-loader": "^4.0.2",
+    "release-it": "^17.4.0",
     "source-map": "^0.7.4",
     "stylus": "^0.63.0",
     "stylus-loader": "^4.3.3",

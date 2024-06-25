@@ -3,7 +3,7 @@ const path = require('path')
 const hash = require('hash-sum')
 const { JSDOM, VirtualConsole } = require('jsdom')
 const webpack = require('webpack')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const { createFsFromVolume, Volume } = require('memfs')
 
 const mfs = createFsFromVolume(new Volume())

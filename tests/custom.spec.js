@@ -9,7 +9,13 @@ test('add custom blocks to the webpack output', async () => {
     entry: 'custom-language.vue',
     module: {
       rules: [
-        { test: /\.js/, loader: 'babel-loader' }
+        {
+          test: /\.js/,
+          loader: 'babel-loader',
+          options: {
+            presets: ['babel-preset-env']
+          }
+        }
       ]
     }
   })
@@ -28,7 +34,13 @@ test('custom blocks should work with src imports', async () => {
     entry: 'custom-import.vue',
     module: {
       rules: [
-        { test: /\.js/, loader: 'babel-loader' }
+        {
+          test: /\.js/,
+          loader: 'babel-loader',
+          options: {
+            presets: ['babel-preset-env']
+          }
+        }
       ]
     }
   })

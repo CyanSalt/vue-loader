@@ -7,7 +7,7 @@ test('source map', async () => {
     devtool: 'source-map'
   })
   const map = mfs.readFileSync('/test.build.js.map', 'utf-8')
-  const smc = new SourceMapConsumer(JSON.parse(map))
+  const smc = await new SourceMapConsumer(JSON.parse(map))
   let line
   let col
   const targetRE = /^\s+msg: 'Hello from Component A!'/

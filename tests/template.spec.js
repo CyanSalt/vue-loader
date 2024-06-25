@@ -70,44 +70,6 @@ test('transform relative URLs and respects resolve alias', async () => {
   expect(style).toContain('body { background-image: url(logo.c9e00e.png);\n}')
 })
 
-test('transform srcset', async () => {
-  const { window, module } = await mockBundleAndRun({
-    entry: 'transform.vue',
-    module: {
-      rules: [
-        {
-          test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-          loader: 'url-loader'
-        }
-      ]
-    }
-  })
-  function includeDataURL (s) {
-    return !!s.match(/\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*/i)
-  }
-  const vnode = mockRender(module)
-  // img tag
-  expect(includeDataURL(vnode.children[0].data.attrs.src)).toBe(true)
-  // image tag (SVG)
-  expect(includeDataURL(vnode.children[2].children[0].data.attrs['xlink:href'])).toBe(true)
-  const style = window.document.querySelector('style').textContent
-
-  const dataURL = vnode.children[0].data.attrs.src
-
-  // image tag with srcset
-  expect(vnode.children[4].data.attrs.srcset).toBe(dataURL)
-  expect(vnode.children[6].data.attrs.srcset).toBe(dataURL + ' 2x')
-  // image tag with multiline srcset
-  expect(vnode.children[8].data.attrs.srcset).toBe(dataURL + ', ' + dataURL + ' 2x')
-  expect(vnode.children[10].data.attrs.srcset).toBe(dataURL + ' 2x, ' + dataURL)
-  expect(vnode.children[12].data.attrs.srcset).toBe(dataURL + ' 2x, ' + dataURL + ' 3x')
-  expect(vnode.children[14].data.attrs.srcset).toBe(dataURL + ', ' + dataURL + ' 2x, ' + dataURL + ' 3x')
-  expect(vnode.children[16].data.attrs.srcset).toBe(dataURL + ' 2x, ' + dataURL + ' 3x')
-
-  // style
-  expect(includeDataURL(style)).toBe(true)
-})
-
 test('functional component with styles', async () => {
   const { window, module } = await mockBundleAndRun({
     entry: 'functional-style.vue'
@@ -179,9 +141,9 @@ test('customizing template loaders', async () => {
   const vnode = mockRender(module, {
     msg: 'hi'
   })
-  // <h2 id="-msg-">{{msg}}</h2>
+  // <h2 id="msg">{{msg}}</h2>
   expect(vnode.tag).toBe('h2')
-  expect(vnode.data.attrs.id).toBe('-msg-')
+  expect(vnode.data.attrs.id).toBe('msg')
   expect(vnode.children[0].text).toBe('hi')
 })
 

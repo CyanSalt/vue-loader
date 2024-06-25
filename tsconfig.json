@@ -1,15 +1,9 @@
 {
+  "extends": "@cyansalt/tsconfig/tsconfig.lib",
   "compilerOptions": {
-    "outDir": "dist",
-    "allowJs": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "strict": true,
-    "target": "es6",
-    "baseUrl": "."
+    "rootDir": "lib"
   },
-  "include": ["lib"],
-  "exclude": [
-    "node_modules"
+  "include": [
+    "lib"
   ]
 }

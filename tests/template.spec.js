@@ -1,17 +1,18 @@
 const path = require('path')
+const { expect, test } = require('@jest/globals')
 const normalizeNewline = require('normalize-newline')
 const {
   mockRender,
-  mockBundleAndRun
+  mockBundleAndRun,
 } = require('./utils')
 
 test('template with comments', async () => {
   const { module } = await mockBundleAndRun({
-    entry: 'template-comment.vue'
+    entry: 'template-comment.vue',
   })
   expect(module.comments).toBe(true)
   const vnode = mockRender(module, {
-    msg: 'hi'
+    msg: 'hi',
   })
   expect(vnode.tag).toBe('div')
   expect(vnode.children.length).toBe(2)
@@ -23,11 +24,11 @@ test('template with comments', async () => {
 
 test('transpile ES2015 features in template', async () => {
   const { module } = await mockBundleAndRun({
-    entry: 'es2015.vue'
+    entry: 'es2015.vue',
   })
   const vnode = mockRender(module, {
     a: 'hello',
-    b: true
+    b: true,
   })
   // <div :class="{[a]:true}"></div>
   expect(vnode.tag).toBe('div')
@@ -40,8 +41,8 @@ test('transform relative URLs and respects resolve alias', async () => {
     entry: 'resolve.vue',
     resolve: {
       alias: {
-        fixtures: path.resolve(__dirname, './fixtures')
-      }
+        fixtures: path.resolve(__dirname, './fixtures'),
+      },
     },
     module: {
       rules: [
@@ -49,11 +50,11 @@ test('transform relative URLs and respects resolve alias', async () => {
           test: /\.png$/,
           loader: 'file-loader',
           options: {
-            name: '[name].[hash:6].[ext]'
-          }
-        }
-      ]
-    }
+            name: '[name].[hash:6].[ext]',
+          },
+        },
+      ],
+    },
   })
   const vnode = mockRender(module)
   // <div>
@@ -72,7 +73,7 @@ test('transform relative URLs and respects resolve alias', async () => {
 
 test('functional component with styles', async () => {
   const { window, module } = await mockBundleAndRun({
-    entry: 'functional-style.vue'
+    entry: 'functional-style.vue',
   })
   expect(module.functional).toBe(true)
   const vnode = mockRender(module)
@@ -91,9 +92,9 @@ test('functional template', async () => {
     entry: 'functional-root.vue',
     vue: {
       compilerOptions: {
-        preserveWhitespace: false
-      }
-    }
+        preserveWhitespace: false,
+      },
+    },
   })
   expect(module.components.Functional._compiled).toBe(true)
   expect(module.components.Functional.functional).toBe(true)
@@ -101,7 +102,7 @@ test('functional template', async () => {
   expect(typeof module.components.Functional.render).toBe('function')
 
   const vnode = mockRender(module, {
-    fn () {}
+    fn() {},
   }).children[0]
 
   // Basic vnode
@@ -133,13 +134,13 @@ test('customizing template loaders', async () => {
       rules: [
         {
           test: /\.md$/,
-          loader: 'markdown-loader'
-        }
-      ]
-    }
+          loader: 'markdown-loader',
+        },
+      ],
+    },
   })
   const vnode = mockRender(module, {
-    msg: 'hi'
+    msg: 'hi',
   })
   // <h2 id="msg">{{msg}}</h2>
   expect(vnode.tag).toBe('h2')
@@ -161,21 +162,21 @@ test('custom compiler modules', async () => {
               if (el.styleBinding) {
                 el.styleBinding = `$processStyle(${el.styleBinding})`
               }
-            }
-          }
-        ]
-      }
-    }
+            },
+          },
+        ],
+      },
+    },
   })
   const results = []
   // var vnode =
   mockRender(
-    Object.assign(module, { methods: { $processStyle: style => results.push(style) }}),
-    { transform: 'translateX(10px)' }
+    Object.assign(module, { methods: { $processStyle: style => results.push(style) } }),
+    { transform: 'translateX(10px)' },
   )
   expect(results).toEqual([
     { 'flex-direction': 'row' },
-    { 'transform': 'translateX(10px)' }
+    { transform: 'translateX(10px)' },
   ])
 })
 
@@ -185,7 +186,7 @@ test('custom compiler directives', async () => {
     vue: {
       compilerOptions: {
         directives: {
-          i18n (el, dir) {
+          i18n(el, dir) {
             if (dir.name === 'i18n' && dir.value) {
               el.i18n = dir.value
               if (!el.props) {
@@ -193,10 +194,10 @@ test('custom compiler directives', async () => {
               }
               el.props.push({ name: 'textContent', value: `_s(${JSON.stringify(dir.value)})` })
             }
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   })
   const vnode = mockRender(module)
   expect(vnode.data.domProps.textContent).toBe('keypath')
@@ -204,7 +205,7 @@ test('custom compiler directives', async () => {
 
 test('multiple roots in template', async () => {
   const { stats } = await mockBundleAndRun({
-    entry: 'multiple-roots-template.vue'
+    entry: 'multiple-roots-template.vue',
   }, true)
   expect(stats.compilation.errors).toHaveLength(1)
   expect(stats.compilation.errors[0].message).toMatch('should contain exactly one root element')
@@ -221,18 +222,18 @@ test('separate loader configuration for template lang and js imports', async () 
             // this applies to <template lang="pug"> in Vue components
             {
               resourceQuery: /^\?vue/,
-              use: ['pug-plain-loader']
+              use: ['pug-plain-loader'],
             },
             // this applies to pug imports inside JavaScript
             {
-              use: ['raw-loader', 'pug-plain-loader']
-            }
-          ]
-        }
-      ]
-    }
+              use: ['raw-loader', 'pug-plain-loader'],
+            },
+          ],
+        },
+      ],
+    },
   })
-  function assertRender (vnode) {
+  function assertRender(vnode) {
     expect(vnode.tag).toBe('div')
     expect(vnode.children[0].tag).toBe('h1')
     expect(vnode.children[0].children[0].text).toBe('hello')
@@ -254,8 +255,8 @@ test('disable prettify', async () => {
     entry: 'prettier-bug.vue',
     vue: {
       productionMode: false,
-      prettify: false
-    }
+      prettify: false,
+    },
   })
 })
 
@@ -267,10 +268,10 @@ test('postLoaders support', async () => {
         {
           resourceQuery: /^\?vue&type=template/,
           enforce: 'post',
-          loader: path.resolve(__dirname, './mock-loaders/html')
-        }
-      ]
-    }
+          loader: path.resolve(__dirname, './mock-loaders/html'),
+        },
+      ],
+    },
   })
   // class="red" -> { staticClass: "red" } -> { staticClass: "green" }
   expect(module.render.toString()).toMatch(`green`)
@@ -283,7 +284,7 @@ test('should skip thread-loader in the template compilation pipeline', async () 
     vue: {
       compilerOptions: {
         directives: {
-          i18n (el, dir) {
+          i18n(el, dir) {
             if (dir.name === 'i18n' && dir.value) {
               el.i18n = dir.value
               if (!el.props) {
@@ -291,9 +292,9 @@ test('should skip thread-loader in the template compilation pipeline', async () 
               }
               el.props.push({ name: 'textContent', value: `_s(${JSON.stringify(dir.value)})` })
             }
-          }
-        }
-      }
+          },
+        },
+      },
     },
     module: {
       rules: [{
@@ -301,11 +302,11 @@ test('should skip thread-loader in the template compilation pipeline', async () 
         use: [{
           loader: 'thread-loader',
           options: {
-            workers: 2
-          }
-        }]
-      }]
-    }
+            workers: 2,
+          },
+        }],
+      }],
+    },
   })
   const vnode = mockRender(module)
   expect(vnode.data.domProps.textContent).toBe('keypath')

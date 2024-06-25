@@ -1,27 +1,28 @@
 const path = require('path')
+const { expect, test } = require('@jest/globals')
+const HTMLPlugin = require('html-webpack-plugin')
 const normalizeNewline = require('normalize-newline')
 const webpack = require('webpack')
-const HTMLPlugin = require('html-webpack-plugin')
 
 const {
   mfs,
   bundle,
   mockRender,
   mockBundleAndRun,
-  DEFAULT_VUE_USE
+  DEFAULT_VUE_USE,
 } = require('./utils')
 
 const assertComponent = ({
   window,
   module,
-  expectedMsg = 'Hello from Component A!'
+  expectedMsg = 'Hello from Component A!',
 }) => {
   if (typeof module === 'function') {
     module = module.options
   }
 
   const vnode = mockRender(module, {
-    msg: 'hi'
+    msg: 'hi',
   })
 
   // <h2 class="red">{{msg}}</h2>
@@ -42,9 +43,9 @@ test('vue rule with include', async () => {
       config.module.rules[0] = {
         test: /\.vue$/,
         include: /fixtures/,
-        use: [DEFAULT_VUE_USE]
+        use: [DEFAULT_VUE_USE],
       }
-    }
+    },
   })
   assertComponent(res)
 })
@@ -56,18 +57,18 @@ test('test-less oneOf rules', async () => {
       config.module.rules = [
         {
           test: /\.vue$/,
-          use: [DEFAULT_VUE_USE]
+          use: [DEFAULT_VUE_USE],
         },
         {
           oneOf: [
             {
               test: /\.css$/,
-              use: ['vue-style-loader', 'css-loader']
-            }
-          ]
-        }
+              use: ['vue-style-loader', 'css-loader'],
+            },
+          ],
+        },
       ]
-    }
+    },
   })
   assertComponent(res)
 })
@@ -83,12 +84,12 @@ test('babel-loader inline options', async () => {
           options: {
             babelrc: false,
             presets: [
-              [require('babel-preset-env'), { modules: false }]
-            ]
-          }
-        }
-      ]
-    }
+              [require('babel-preset-env'), { modules: false }],
+            ],
+          },
+        },
+      ],
+    },
   }, true)
 })
 
@@ -99,9 +100,9 @@ test('normalize multiple use + options', async () => {
     modify: config => {
       config.module.rules[0] = {
         test: /\.vue$/,
-        use: [DEFAULT_VUE_USE]
+        use: [DEFAULT_VUE_USE],
       }
-    }
+    },
   }, true)
 })
 
@@ -116,12 +117,12 @@ test('should not duplicate css modules value imports', async () => {
           {
             loader: 'css-loader',
             options: {
-              modules: true
-            }
-          }
-        ]
+              modules: true,
+            },
+          },
+        ],
       }
-    }
+    },
   })
   const localsRE = /exports.locals = {\s+"color": "red"\s+};/
   const matches = code.match(localsRE)
@@ -143,9 +144,9 @@ test('html-webpack-plugin', async () => {
       new HTMLPlugin({
         inject: true,
         template: path.resolve(__dirname, 'fixtures/index.html'),
-        filename: 'output.html'
-      })
-    ]
+        filename: 'output.html',
+      }),
+    ],
   }, true)
   const html = mfs.readFileSync('/output.html', 'utf-8')
   expect(html).toMatch('test.build.js')
@@ -157,9 +158,9 @@ test('usage with null-loader', async () => {
     modify: config => {
       config.module.rules[1] = {
         test: /\.css$/,
-        use: ['null-loader']
+        use: ['null-loader'],
       }
-    }
+    },
   })
 })
 
@@ -167,17 +168,17 @@ test('proper dedupe on src-imports with options', async () => {
   const res = await mockBundleAndRun({
     entry: 'ts.vue',
     resolve: {
-      extensions: ['.ts', '.js']
+      extensions: ['.ts', '.js'],
     },
     module: {
       rules: [
         {
           test: /\.ts$/,
           loader: 'ts-loader',
-          options: { appendTsSuffixTo: [/\.vue$/], transpileOnly: true }
-        }
-      ]
-    }
+          options: { appendTsSuffixTo: [/\.vue$/], transpileOnly: true },
+        },
+      ],
+    },
   })
   assertComponent(res)
 }, 30000)
@@ -191,17 +192,17 @@ test('use with postLoader', async () => {
         {
           test: /\.js$/,
           use: {
-            loader: require.resolve('./mock-loaders/js')
+            loader: require.resolve('./mock-loaders/js'),
           },
-          enforce: 'post'
-        }
-      ]
-    }
+          enforce: 'post',
+        },
+      ],
+    },
   })
   assertComponent({
     window,
     module,
-    expectedMsg: 'Changed!'
+    expectedMsg: 'Changed!',
   })
 })
 
@@ -214,7 +215,7 @@ test('data: URI as entry', async () => {
 
   await bundle({
     entry: {
-      main: 'data:text/javascript,console.log("hello world")'
-    }
+      main: 'data:text/javascript,console.log("hello world")',
+    },
   })
 })

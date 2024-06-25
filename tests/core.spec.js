@@ -1,18 +1,18 @@
+const { expect, test } = require('@jest/globals')
+const normalizeNewline = require('normalize-newline')
 const {
   genId,
   mockRender,
   mockBundleAndRun,
-  initStylesForAllSubComponents
+  initStylesForAllSubComponents,
 } = require('./utils')
-
-const normalizeNewline = require('normalize-newline')
 
 test('basic', async () => {
   const { window, module } = await mockBundleAndRun({
-    entry: 'basic.vue'
+    entry: 'basic.vue',
   })
   const vnode = mockRender(module, {
-    msg: 'hi'
+    msg: 'hi',
   })
 
   // <h2 class="red">{{msg}}</h2>
@@ -36,23 +36,23 @@ test('pre-processors', async () => {
           exclude: /node_modules/,
           loader: 'babel-loader',
           options: {
-            presets: ['babel-preset-env']
-          }
+            presets: ['babel-preset-env'],
+          },
         },
         {
           test: /\.pug$/,
-          loader: 'pug-plain-loader'
+          loader: 'pug-plain-loader',
         },
         {
           test: /\.stylus$/,
           use: [
             'vue-style-loader',
             'css-loader',
-            'stylus-loader'
-          ]
-        }
-      ]
-    }
+            'stylus-loader',
+          ],
+        },
+      ],
+    },
   })
   // make sure babel is actually applied
   expect(code).toMatch('data: function data()')
@@ -76,7 +76,7 @@ test('pre-processors', async () => {
 
 test('style import', async () => {
   const { window } = await mockBundleAndRun({
-    entry: 'style-import.vue'
+    entry: 'style-import.vue',
   })
   const styles = window.document.querySelectorAll('style')
   expect(styles[0].textContent).toContain('h1 { color: red;\n}')
@@ -87,7 +87,7 @@ test('style import', async () => {
 
 test('style import for a same file twice', async () => {
   const { window, module } = await mockBundleAndRun({
-    entry: 'style-import-twice.vue'
+    entry: 'style-import-twice.vue',
   })
   initStylesForAllSubComponents(module)
   const styles = window.document.querySelectorAll('style')
@@ -102,7 +102,7 @@ test('style import for a same file twice', async () => {
 
 test('template import', async () => {
   const { module } = await mockBundleAndRun({
-    entry: 'template-import.vue'
+    entry: 'template-import.vue',
   })
   const vnode = mockRender(module)
   // '<div><h1>hello</h1></div>'
@@ -117,10 +117,10 @@ test('template import with pre-processors', async () => {
       rules: [
         {
           test: /\.pug$/,
-          loader: 'pug-plain-loader'
-        }
-      ]
-    }
+          loader: 'pug-plain-loader',
+        },
+      ],
+    },
   })
   const vnode = mockRender(module)
   // '<div><h1>hello</h1></div>'
@@ -130,7 +130,7 @@ test('template import with pre-processors', async () => {
 
 test('script import', async () => {
   const { module } = await mockBundleAndRun({
-    entry: 'script-import.vue'
+    entry: 'script-import.vue',
   })
   expect(module.data().msg).toContain('Hello from Component A!')
 })
@@ -145,20 +145,20 @@ test('cloned rules should not intefere with each other', async () => {
         use: [
           {
             loader: 'babel-loader',
-            options: {}
-          }
-        ]
+            options: {},
+          },
+        ],
       }, {
         test: /\.some-random-extension$/,
         use: [
           {
             loader: 'css-loader',
             options: {
-              url: true
-            }
-          }
-        ]
-      }]
-    }
+              url: true,
+            },
+          },
+        ],
+      }],
+    },
   })
 })

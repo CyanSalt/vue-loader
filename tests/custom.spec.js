@@ -1,7 +1,8 @@
 const path = require('path')
+const { expect, test } = require('@jest/globals')
 const {
   bundle,
-  mockBundleAndRun
+  mockBundleAndRun,
 } = require('./utils')
 
 test('add custom blocks to the webpack output', async () => {
@@ -13,11 +14,11 @@ test('add custom blocks to the webpack output', async () => {
           test: /\.js/,
           loader: 'babel-loader',
           options: {
-            presets: ['babel-preset-env']
-          }
-        }
-      ]
-    }
+            presets: ['babel-preset-env'],
+          },
+        },
+      ],
+    },
   })
   // should also be transpiled
   expect(code).toContain(`
@@ -38,11 +39,11 @@ test('custom blocks should work with src imports', async () => {
           test: /\.js/,
           loader: 'babel-loader',
           options: {
-            presets: ['babel-preset-env']
-          }
-        }
-      ]
-    }
+            presets: ['babel-preset-env'],
+          },
+        },
+      ],
+    },
   })
   expect(code).toContain(`
 describe('example', function () {
@@ -60,17 +61,17 @@ test('passes Component to custom block loaders', async () => {
       rules: [
         {
           resourceQuery: /blockType=documentation/,
-          loader: require.resolve('./mock-loaders/docs')
-        }
-      ]
-    }
+          loader: require.resolve('./mock-loaders/docs'),
+        },
+      ],
+    },
   })
   expect(module.__docs).toContain('This is example documentation for a component.')
 })
 
 test('custom blocks can be ignored', async () => {
   const { code } = await bundle({
-    entry: 'custom-language.vue'
+    entry: 'custom-language.vue',
   })
   expect(code).not.toContain(`describe('example'`)
 })
@@ -84,11 +85,11 @@ test('custom blocks can be ignored even if cache-loader processes them', async (
           test: /.vue$/,
           loader: 'cache-loader',
           options: {
-            cacheDirectory: path.resolve(__dirname, '.cache')
-          }
-        }
-      ]
-    }
+            cacheDirectory: path.resolve(__dirname, '.cache'),
+          },
+        },
+      ],
+    },
   })
   expect(code).not.toContain(`describe('example'`)
 })

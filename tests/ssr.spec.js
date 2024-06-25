@@ -1,3 +1,4 @@
+const { expect, test } = require('@jest/globals')
 const SSR = require('vue-server-renderer')
 
 const {
@@ -5,7 +6,7 @@ const {
   bundle,
   baseConfig,
   interopDefault,
-  DEFAULT_VUE_USE
+  DEFAULT_VUE_USE,
 } = require('./utils')
 
 test('SSR style and moduleId extraction', async () => {
@@ -15,16 +16,16 @@ test('SSR style and moduleId extraction', async () => {
     output: {
       path: '/',
       filename: 'test.build.js',
-      libraryTarget: 'commonjs2'
+      libraryTarget: 'commonjs2',
     },
-    externals: ['vue']
+    externals: ['vue'],
   })
   const renderer = SSR.createBundleRenderer(code, {
     basedir: __dirname,
-    runInNewContext: 'once'
+    runInNewContext: 'once',
   })
   const context = {
-    _registeredComponents: new Set()
+    _registeredComponents: new Set(),
   }
   const res = await renderer.renderToString(context)
   expect(res).toContain('data-server-rendered')
@@ -50,16 +51,16 @@ test('SSR with scoped CSS', async () => {
     output: {
       path: '/',
       filename: 'test.build.js',
-      libraryTarget: 'commonjs2'
+      libraryTarget: 'commonjs2',
     },
-    externals: ['vue']
+    externals: ['vue'],
   })
   const renderer = SSR.createBundleRenderer(code, {
     basedir: __dirname,
-    runInNewContext: 'once'
+    runInNewContext: 'once',
   })
   const context = {
-    _registeredComponents: new Set()
+    _registeredComponents: new Set(),
   }
   const res = await renderer.renderToString(context)
 
@@ -73,7 +74,7 @@ test('SSR with scoped CSS', async () => {
   const style = context.styles
 
   expect(style).toContain(`.test[${id}] {\n  color: yellow;\n}`)
-  expect(style).toContain(`.test[${id}]:after {\n  content: \'bye!\';\n}`)
+  expect(style).toContain(`.test[${id}]:after {\n  content: 'bye!';\n}`)
   expect(style).toContain(`h1[${id}] {\n  color: green;\n}`)
   // scoped keyframes
   expect(style).toContain(`.anim[${id}] {\n  animation: color-${shortId} 5s infinite, other 5s;`)
@@ -83,7 +84,7 @@ test('SSR with scoped CSS', async () => {
   expect(style).toContain(`@-webkit-keyframes color-${shortId} {`)
 
   expect(style).toContain(
-    `.anim-multiple[${id}] {\n  animation: color-${shortId} 5s infinite,opacity-${shortId} 2s;`
+    `.anim-multiple[${id}] {\n  animation: color-${shortId} 5s infinite,opacity-${shortId} 2s;`,
   )
   expect(style).toContain(`.anim-multiple-2[${id}] {\n  animation-name: color-${shortId},opacity-${shortId};`)
   expect(style).toContain(`@keyframes opacity-${shortId} {`)
@@ -97,35 +98,33 @@ test('SSR + CSS Modules', async () => {
     'vue-style-loader',
     {
       loader: 'css-loader',
-      options: { modules: true }
-    }
+      options: { modules: true },
+    },
   ]
 
   const { code } = await bundle({
     entry: 'css-modules.vue',
     target: 'node',
-    output: Object.assign({}, baseConfig.output, {
-      libraryTarget: 'commonjs2'
-    }),
+    output: { ...baseConfig.output, libraryTarget: 'commonjs2' },
     modify: config => {
       config.module.rules = [
         { test: /\.vue$/, use: [DEFAULT_VUE_USE] },
         {
           test: /\.css$/,
-          use: baseLoaders
+          use: baseLoaders,
         },
         {
           test: /\.stylus$/,
           use: [
             ...baseLoaders,
-            'stylus-loader'
-          ]
-        }
+            'stylus-loader',
+          ],
+        },
       ]
-    }
+    },
   })
   // http://stackoverflow.com/questions/17581830/load-node-js-module-from-string-in-memory
-  function requireFromString (src, filename) {
+  function requireFromString(src, filename) {
     const Module = require('module')
     const m = new Module()
     m._compile(src, filename)

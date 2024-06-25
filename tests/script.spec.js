@@ -1,16 +1,17 @@
+const { expect, test } = require('@jest/globals')
 const {
   mockRender,
-  mockBundleAndRun
+  mockBundleAndRun,
 } = require('./utils')
 
 test('allow exporting extended constructor', async () => {
   const { module } = await mockBundleAndRun({
-    entry: 'extend.vue'
+    entry: 'extend.vue',
   })
   // extend.vue should export Vue constructor
   const Component = module
   const vnode = mockRender(Component.options, {
-    msg: 'success'
+    msg: 'success',
   })
   expect(vnode.tag).toBe('div')
   expect(vnode.children[0].text).toBe('success')
@@ -19,7 +20,7 @@ test('allow exporting extended constructor', async () => {
 
 test('named exports', async () => {
   const { exports } = await mockBundleAndRun({
-    entry: 'named-exports.vue'
+    entry: 'named-exports.vue',
   })
   expect(exports.default.name).toBe('named-exports')
   expect(exports.foo()).toBe(1)

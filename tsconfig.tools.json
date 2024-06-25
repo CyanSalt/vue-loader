@@ -1,0 +1,11 @@
+{
+  "extends": "@cyansalt/tsconfig/tsconfig.app",
+  "include": [
+    "**/*.js",
+    "**/*.mjs"
+  ],
+  "exclude": [
+    "**/dist",
+    "**/node_modules"
+  ]
+}

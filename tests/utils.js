@@ -1,19 +1,20 @@
-const Vue = require('vue')
 const path = require('path')
+const { expect } = require('@jest/globals')
 const hash = require('hash-sum')
 const { JSDOM, VirtualConsole } = require('jsdom')
+const { createFsFromVolume, Volume } = require('memfs')
+const Vue = require('vue')
 const webpack = require('webpack')
 const { merge } = require('webpack-merge')
-const { createFsFromVolume, Volume } = require('memfs')
 
 const mfs = createFsFromVolume(new Volume())
 const VueLoaderPlugin = require('../lib/plugin')
 
 const DEFAULT_VUE_USE = {
-  loader: 'vue-loader',
+  loader: '@cyansalt/vue-loader',
   options: {
-    experimentalInlineMatchResource: Boolean(process.env.INLINE_MATCH_RESOURCE)
-  }
+    experimentalInlineMatchResource: Boolean(process.env.INLINE_MATCH_RESOURCE),
+  },
 }
 
 const baseConfig = {
@@ -22,50 +23,52 @@ const baseConfig = {
   output: {
     path: '/',
     publicPath: '',
-    filename: 'test.build.js'
+    filename: 'test.build.js',
   },
   resolveLoader: {
     alias: {
-      'vue-loader': require.resolve('../lib')
-    }
+      '@cyansalt/vue-loader': require.resolve('../lib'),
+    },
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
-        use: [DEFAULT_VUE_USE]
-      }
-    ]
+        use: [DEFAULT_VUE_USE],
+      },
+    ],
   },
   plugins: [
     new VueLoaderPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin()
+    new webpack.optimize.ModuleConcatenationPlugin(),
   ],
   // https://github.com/webpack/webpack/issues/10542
   optimization: {
-    usedExports: false
-  }
+    usedExports: false,
+  },
 }
 
-function genId (file) {
+function genId(file) {
   return hash(path.join('tests', 'fixtures', file).replace(/\\/g, '/'))
 }
 
-function bundle (options, wontThrowError) {
+function bundle(options, wontThrowError) {
   let config = merge({}, baseConfig, options)
   if (!options.experiments || !options.experiments.css) {
-    config.module && config.module.rules && config.module.rules.push({
-      test: /\.css$/,
-      use: ['vue-style-loader', 'css-loader']
-    })
+    if (config.module && config.module.rules) {
+      config.module.rules.push({
+        test: /\.css$/,
+        use: ['vue-style-loader', 'css-loader'],
+      })
+    }
   }
   if (config.vue) {
     const vueOptions = {
       // Test experimental inline match resource by default
       experimentalInlineMatchResource: Boolean(
-        process.env.INLINE_MATCH_RESOURCE
+        process.env.INLINE_MATCH_RESOURCE,
       ),
-      ...options.vue
+      ...options.vue,
     }
     delete config.vue
     const vueIndex = config.module.rules.findIndex(r => r.test.test('.vue'))
@@ -75,14 +78,10 @@ function bundle (options, wontThrowError) {
     if (vueRule && typeof vueRule === 'object' && Array.isArray(vueRule.use)) {
       // Vue usually locates at the first loader
       if (vueRule.use && typeof vueRule.use[0] === 'object') {
-        vueRule.use[0] = Object.assign({}, vueRule.use[0], {
-          options: vueOptions
-        })
+        vueRule.use[0] = { ...vueRule.use[0], options: vueOptions }
       }
     } else {
-      config.module.rules[vueIndex] = Object.assign({}, vueRule, {
-        options: vueOptions
-      })
+      config.module.rules[vueIndex] = { ...vueRule, options: vueOptions }
     }
   }
 
@@ -92,9 +91,9 @@ function bundle (options, wontThrowError) {
       entry: require.resolve('./fixtures/entry'),
       resolve: {
         alias: {
-          '~target': path.resolve(__dirname, './fixtures', vueFile)
-        }
-      }
+          '~target': path.resolve(__dirname, './fixtures', vueFile),
+        },
+      },
     })
   }
 
@@ -122,21 +121,21 @@ function bundle (options, wontThrowError) {
       } else {
         resolve({
           code: mfs.readFileSync('/test.build.js').toString(),
-          stats
+          stats,
         })
       }
     })
   })
 }
 
-async function mockBundleAndRun (options, wontThrowError) {
+async function mockBundleAndRun(options, wontThrowError) {
   const { code, stats } = await bundle(options, wontThrowError)
 
   let dom
   try {
     dom = new JSDOM(`<!DOCTYPE html><html><head></head><body></body></html>`, {
       runScripts: 'outside-only',
-      virtualConsole: new VirtualConsole()
+      virtualConsole: new VirtualConsole(),
     })
     dom.window.eval(code)
   } catch (e) {
@@ -156,26 +155,26 @@ async function mockBundleAndRun (options, wontThrowError) {
     exports,
     instance,
     code,
-    stats
+    stats,
   }
 }
 
-function mockRender (options, data = {}) {
-  const vm = new Vue(Object.assign({}, options, { data () { return data } }))
+function mockRender(options, data = {}) {
+  const vm = new Vue({ ...options,
+    data() {
+      return data
+    } })
   vm.$mount()
   return vm._vnode
 }
 
-function interopDefault (module) {
-  return module
-    ? module.default ? module.default : module
-    : module
+function interopDefault(module) {
+  return module && (module.default || module)
 }
 
-function initStylesForAllSubComponents (module) {
+function initStylesForAllSubComponents(module) {
   if (module.components) {
-    for (const name in module.components) {
-      const sub = module.components[name]
+    for (const sub of Object.values(module.components)) {
       const instance = {}
       if (sub && sub.beforeCreate) {
         sub.beforeCreate.forEach(hook => hook.call(instance))
@@ -194,5 +193,5 @@ module.exports = {
   mockRender,
   interopDefault,
   initStylesForAllSubComponents,
-  DEFAULT_VUE_USE
+  DEFAULT_VUE_USE,
 }

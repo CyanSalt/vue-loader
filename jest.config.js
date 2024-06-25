@@ -5,7 +5,7 @@ console.log(
     !isWebpack4 && process.env.INLINE_MATCH_RESOURCE
       ? ' with inline match resource enabled'
       : ''
-  }...`
+  }...`,
 )
 
 module.exports = {
@@ -15,13 +15,13 @@ module.exports = {
   testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/node_modules/'],
   globals: {
     'ts-jest': {
-      diagnostics: false
-    }
+      diagnostics: false,
+    },
   },
   moduleNameMapper: process.env.WEBPACK4
     ? {
-        '^webpack$': 'webpack4',
-        '^webpack/(.*)': 'webpack4/$1'
-      }
-    : undefined
+      '^webpack$': 'webpack4',
+      '^webpack/(.*)': 'webpack4/$1',
+    }
+    : undefined,
 }

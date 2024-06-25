@@ -1,12 +1,13 @@
-const normalizeNewline = require('normalize-newline')
+const { expect, test } = require('@jest/globals')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const normalizeNewline = require('normalize-newline')
 
 const {
   mfs,
   genId,
   bundle,
   mockBundleAndRun,
-  DEFAULT_VUE_USE
+  DEFAULT_VUE_USE,
 } = require('./utils')
 
 test('support chaining with other loaders', async () => {
@@ -17,10 +18,10 @@ test('support chaining with other loaders', async () => {
         test: /\.vue$/,
         use: [
           DEFAULT_VUE_USE,
-          require.resolve('./mock-loaders/js')
-        ]
+          require.resolve('./mock-loaders/js'),
+        ],
       }
-    }
+    },
   })
   expect(module.data().msg).toBe('Changed!')
 })
@@ -33,17 +34,17 @@ test('inherit queries on files', async () => {
         test: /\.vue$/,
         use: [
           DEFAULT_VUE_USE,
-          require.resolve('./mock-loaders/query')
-        ]
+          require.resolve('./mock-loaders/query'),
+        ],
       }
-    }
+    },
   })
   expect(module.data().msg).toBe('Changed!')
 })
 
 test('expose file path as __file outside production', async () => {
   const { module } = await mockBundleAndRun({
-    entry: 'basic.vue'
+    entry: 'basic.vue',
   })
   expect(module.__file).toBe('tests/fixtures/basic.vue')
 })
@@ -51,7 +52,7 @@ test('expose file path as __file outside production', async () => {
 test('no __file in production when exposeFilename disabled', async () => {
   const { module } = await mockBundleAndRun({
     mode: 'production',
-    entry: 'basic.vue'
+    entry: 'basic.vue',
   })
   expect(module.__file).toBe(undefined)
 })
@@ -61,8 +62,8 @@ test('expose file basename as __file in production when exposeFilename enabled',
     mode: 'production',
     entry: 'basic.vue',
     vue: {
-      exposeFilename: true
-    }
+      exposeFilename: true,
+    },
   })
   expect(module.__file).toBe('basic.vue')
 })
@@ -74,30 +75,30 @@ test('extract CSS', async () => {
       config.module.rules = [
         {
           test: /\.vue$/,
-          use: [DEFAULT_VUE_USE]
+          use: [DEFAULT_VUE_USE],
         },
         {
           test: /\.css$/,
           use: [
             MiniCssExtractPlugin.loader,
-            'css-loader'
-          ]
+            'css-loader',
+          ],
         },
         {
           test: /\.stylus$/,
           use: [
             MiniCssExtractPlugin.loader,
             'css-loader',
-            'stylus-loader'
-          ]
-        }
+            'stylus-loader',
+          ],
+        },
       ]
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: 'test.output.css'
-      })
-    ]
+        filename: 'test.output.css',
+      }),
+    ],
   })
   const css = normalizeNewline(mfs.readFileSync('/test.output.css').toString())
   const id = `data-v-${genId('extract-css.vue')}`
@@ -113,22 +114,22 @@ test('extract CSS with code spliting', async () => {
       config.module.rules = [
         {
           test: /\.vue$/,
-          use: [DEFAULT_VUE_USE]
+          use: [DEFAULT_VUE_USE],
         },
         {
           test: /\.css$/,
           use: [
             MiniCssExtractPlugin.loader,
-            'css-loader'
-          ]
-        }
+            'css-loader',
+          ],
+        },
       ]
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: 'test.output.css'
-      })
-    ]
+        filename: 'test.output.css',
+      }),
+    ],
   })
   const css = normalizeNewline(mfs.readFileSync('/test.output.css').toString())
   expect(css).toContain(`h1 {\n  color: red;\n}`)
@@ -153,18 +154,18 @@ test('support rules with oneOf', async () => {
                   loader: 'css-loader',
                   options: {
                     modules: true,
-                    localIdentName: '[local]_[hash:base64:5]'
-                  }
-                }
-              ]
+                    localIdentName: '[local]_[hash:base64:5]',
+                  },
+                },
+              ],
             },
             {
-              use: ['css-loader']
-            }
-          ]
-        }
+              use: ['css-loader'],
+            },
+          ],
+        },
       ]
-    }
+    },
   })
 
   await run('basic.vue', ({ window }) => {
@@ -187,8 +188,8 @@ test('should work with eslint loader', async () => {
     entry: 'basic.vue',
     modify: config => {
       config.module.rules.unshift({
-        test: /\.vue$/, use: [DEFAULT_VUE_USE], enforce: 'pre'
+        test: /\.vue$/, use: [DEFAULT_VUE_USE], enforce: 'pre',
       })
-    }
+    },
   })
 })

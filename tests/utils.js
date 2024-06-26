@@ -11,7 +11,7 @@ const mfs = createFsFromVolume(new Volume())
 const VueLoaderPlugin = require('../lib/plugin')
 
 const DEFAULT_VUE_USE = {
-  loader: '@cyansalt/vue-loader',
+  loader: '@legacy-vue/vue-loader',
   options: {
     experimentalInlineMatchResource: Boolean(process.env.INLINE_MATCH_RESOURCE),
   },
@@ -27,7 +27,7 @@ const baseConfig = {
   },
   resolveLoader: {
     alias: {
-      '@cyansalt/vue-loader': require.resolve('../lib'),
+      '@legacy-vue/vue-loader': require.resolve('../lib'),
     },
   },
   module: {

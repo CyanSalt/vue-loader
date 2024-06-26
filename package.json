@@ -1,5 +1,5 @@
 {
-  "name": "@cyansalt/vue-loader",
+  "name": "@legacy-vue/vue-loader",
   "version": "15.12.1",
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 {
   "name": "@cyansalt/vue-loader",
-  "version": "15.12.0",
+  "version": "15.12.1",
   "publishConfig": {
     "access": "public"
   },

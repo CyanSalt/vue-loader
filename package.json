@@ -1,6 +1,6 @@
 {
   "name": "@legacy-vue/vue-loader",
-  "version": "15.12.1",
+  "version": "15.12.2",
   "publishConfig": {
     "access": "public"
   },

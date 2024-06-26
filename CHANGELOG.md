@@ -1,5 +1,7 @@
 
 
+## [15.12.2](https://github.com/CyanSalt/vue-loader/compare/v15.12.1...v15.12.2) (2024-06-26)
+
 ## [15.12.1](https://github.com/CyanSalt/vue-loader/compare/v15.12.0...v15.12.1) (2024-06-26)
 
 

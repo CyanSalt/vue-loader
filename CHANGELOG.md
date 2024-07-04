@@ -1,5 +1,12 @@
 
 
+## [15.12.3](https://github.com/CyanSalt/vue-loader/compare/v15.12.2...v15.12.3) (2024-07-04)
+
+
+### Bug Fixes
+
+* ignore syntax error detection when using TS ([9c23c85](https://github.com/CyanSalt/vue-loader/commit/9c23c855aad5be52e2b652233ae11425c69d139b))
+
 ## [15.12.2](https://github.com/CyanSalt/vue-loader/compare/v15.12.1...v15.12.2) (2024-06-26)
 
 ## [15.12.1](https://github.com/CyanSalt/vue-loader/compare/v15.12.0...v15.12.1) (2024-06-26)

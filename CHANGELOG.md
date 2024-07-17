@@ -1,5 +1,12 @@
 
 
+## [15.12.4](https://github.com/CyanSalt/vue-loader/compare/v15.12.3...v15.12.4) (2024-07-17)
+
+
+### Bug Fixes
+
+* use custom compiler ([a22d873](https://github.com/CyanSalt/vue-loader/commit/a22d873adc3870c2180b9c8e1445d94b73eca67b))
+
 ## [15.12.3](https://github.com/CyanSalt/vue-loader/compare/v15.12.2...v15.12.3) (2024-07-04)
 
 

@@ -1,9 +1,7 @@
 {
-  "extends": "@cyansalt/tsconfig/tsconfig.lib",
-  "compilerOptions": {
-    "rootDir": "lib"
-  },
-  "include": [
-    "lib"
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.lib.json" },
+    { "path": "./tsconfig.node.json" }
   ]
 }

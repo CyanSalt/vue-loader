@@ -15,6 +15,7 @@
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider jest",
     "test:match-resource": "cross-env INLINE_MATCH_RESOURCE=true NODE_OPTIONS=--openssl-legacy-provider jest",
     "lint": "eslint --fix './**/*.{js,mjs}'",
+    "lint:ci": "eslint --max-warnings 0 './**/*.{js,mjs}'",
     "release": "release-it"
   },
   "bugs": {
@@ -24,6 +25,24 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/CyanSalt/vue-loader.git"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.15.0",
+      "onFail": "error"
+    },
+    "packageManager": [
+      {
+        "name": "pnpm",
+        "version": "^11.0.0",
+        "onFail": "error"
+      },
+      {
+        "name": "npm",
+        "onFail": "ignore"
+      }
+    ]
   },
   "peerDependencies": {
     "css-loader": "*",

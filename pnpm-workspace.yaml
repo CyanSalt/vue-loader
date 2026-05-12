@@ -1,0 +1,5 @@
+allowBuilds:
+  # Prepare binary or other required files
+  fsevents: true
+  # Just banners in console
+  core-js: false

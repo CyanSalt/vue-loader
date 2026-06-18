@@ -1,4 +1,11 @@
+# Changelog
 
+## [15.12.5](https://github.com/CyanSalt/vue-loader/compare/v15.12.4...v15.12.5) (2026-06-18)
+
+### Bug Fixes
+
+* expose absolute path in development ([c03a3c2](https://github.com/CyanSalt/vue-loader/commit/c03a3c29b6df46928f28af5cb7f56daf366edae3))
+* pnpm version ([b7da760](https://github.com/CyanSalt/vue-loader/commit/b7da7606009cc816fa5cd9351d07e29666279221))
 
 ## [15.12.4](https://github.com/CyanSalt/vue-loader/compare/v15.12.3...v15.12.4) (2024-07-17)
 

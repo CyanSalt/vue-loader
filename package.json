@@ -24,7 +24,7 @@
   "homepage": "https://github.com/CyanSalt/vue-loader",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CyanSalt/vue-loader.git"
+    "url": "git+https://github.com/CyanSalt/vue-loader.git"
   },
   "devEngines": {
     "runtime": {
